@@ -1,14 +1,12 @@
 Lib-Droid-CalDroid
 ==================
-
 fork of https://github.com/roomorama/Caldroid.git
-==================
 
 -----------------------------------------------------------
 -----------------------------------------------------------
 
 Original
-
+==================
 Caldroid
 Caldroid is a fragment that display calendar with dates in a month. Caldroid can be used as embedded fragment, or as dialog fragment. User can also swipe left/right to navigate to different months.
 
