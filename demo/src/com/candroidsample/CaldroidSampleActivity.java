@@ -18,7 +18,6 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 @SuppressLint("SimpleDateFormat")
 public class CaldroidSampleActivity extends FragmentActivity {
 	private boolean undo = false;
@@ -29,12 +28,12 @@ public class CaldroidSampleActivity extends FragmentActivity {
 		Calendar cal = Calendar.getInstance();
 
 		// Min date is last 7 days
-		cal.add(Calendar.DATE, -3);
+		cal.add(Calendar.DATE, -18);
 		Date blueDate = cal.getTime();
 
 		// Max date is next 7 days
 		cal = Calendar.getInstance();
-		cal.add(Calendar.DATE, 4);
+		cal.add(Calendar.DATE, 16);
 		Date greenDate = cal.getTime();
 
 		if (caldroidFragment != null) {
@@ -77,10 +76,11 @@ public class CaldroidSampleActivity extends FragmentActivity {
 			args.putInt(CaldroidFragment.MONTH, cal.get(Calendar.MONTH) + 1);
 			args.putInt(CaldroidFragment.YEAR, cal.get(Calendar.YEAR));
 			args.putBoolean(CaldroidFragment.ENABLE_SWIPE, true);
-			args.putBoolean(CaldroidFragment.FIT_ALL_MONTHS, false);
+			args.putBoolean(CaldroidFragment.SIX_WEEKS_IN_CALENDAR, true);
 
 			// Uncomment this to customize startDayOfWeek
-//			args.putInt(CaldroidFragment.START_DAY_OF_WEEK, CaldroidFragment.TUESDAY); // Tuesday
+			// args.putInt(CaldroidFragment.START_DAY_OF_WEEK,
+			// CaldroidFragment.TUESDAY); // Tuesday
 			caldroidFragment.setArguments(args);
 		}
 
@@ -113,6 +113,15 @@ public class CaldroidSampleActivity extends FragmentActivity {
 				Toast.makeText(getApplicationContext(),
 						"Long click " + formatter.format(date),
 						Toast.LENGTH_SHORT).show();
+			}
+
+			@Override
+			public void onCaldroidViewCreated() {
+				if (caldroidFragment.getLeftArrowButton() != null) {
+					Toast.makeText(getApplicationContext(),
+							"Caldroid view is created", Toast.LENGTH_SHORT)
+							.show();
+				}
 			}
 
 		};
@@ -189,9 +198,9 @@ public class CaldroidSampleActivity extends FragmentActivity {
 				caldroidFragment.refreshView();
 
 				// Move to date
-//				cal = Calendar.getInstance();
-//				cal.add(Calendar.MONTH, 12);
-//				caldroidFragment.moveToDate(cal.getTime());
+				// cal = Calendar.getInstance();
+				// cal.add(Calendar.MONTH, 12);
+				// caldroidFragment.moveToDate(cal.getTime());
 
 				String text = "Today: " + formatter.format(new Date()) + "\n";
 				text += "Min Date: " + formatter.format(minDate) + "\n";

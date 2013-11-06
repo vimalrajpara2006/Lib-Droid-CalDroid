@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
-import com.caldroid.R;
-
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -16,6 +14,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+
+import com.caldroid.R;
 
 /**
  * The CaldroidGridAdapter provides customized view for the dates gridview
@@ -40,6 +40,7 @@ public class CaldroidGridAdapter extends BaseAdapter {
 	protected DateTime maxDateTime;
 	protected DateTime today;
 	protected int startDayOfWeek;
+	protected boolean sixWeeksInCalendar;
 	protected Resources resources;
 
 	/**
@@ -55,7 +56,7 @@ public class CaldroidGridAdapter extends BaseAdapter {
 		this.month = dateTime.getMonth();
 		this.year = dateTime.getYear();
 		this.datetimeList = CalendarHelper.getFullWeeks(this.month, this.year,
-				startDayOfWeek);
+				startDayOfWeek, sixWeeksInCalendar);
 	}
 
 	// GETTERS AND SETTERS
@@ -167,9 +168,11 @@ public class CaldroidGridAdapter extends BaseAdapter {
 				.get(CaldroidFragment._MAX_DATE_TIME);
 		startDayOfWeek = (Integer) caldroidData
 				.get(CaldroidFragment.START_DAY_OF_WEEK);
+		sixWeeksInCalendar = (Boolean) caldroidData
+				.get(CaldroidFragment.SIX_WEEKS_IN_CALENDAR);
 
 		this.datetimeList = CalendarHelper.getFullWeeks(this.month, this.year,
-				startDayOfWeek);
+				startDayOfWeek, sixWeeksInCalendar);
 	}
 
 	protected DateTime getToday() {
@@ -209,35 +212,16 @@ public class CaldroidGridAdapter extends BaseAdapter {
 		}
 	}
 
-	@Override
-	public int getCount() {
-		// TODO Auto-generated method stub
-		return this.datetimeList.size();
-	}
-
-	@Override
-	public Object getItem(int arg0) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public long getItemId(int arg0) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
-		LayoutInflater inflater = (LayoutInflater) context
-				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		TextView cellView = (TextView) convertView;
-
-		// For reuse
-		if (convertView == null) {
-			cellView = (TextView) inflater.inflate(R.layout.date_cell, null);
-		}
-
+	/**
+	 * Customize colors of text and background based on states of the cell
+	 * (disabled, active, selected, etc)
+	 * 
+	 * To be used only in getView method
+	 * 
+	 * @param position
+	 * @param cellView
+	 */
+	protected void customizeTextView(int position, TextView cellView) {
 		cellView.setTextColor(Color.BLACK);
 
 		// Get dateTime of this cell
@@ -299,6 +283,38 @@ public class CaldroidGridAdapter extends BaseAdapter {
 
 		// Set custom color if required
 		setCustomResources(dateTime, cellView);
+	}
+
+	@Override
+	public int getCount() {
+		// TODO Auto-generated method stub
+		return this.datetimeList.size();
+	}
+
+	@Override
+	public Object getItem(int arg0) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public long getItemId(int arg0) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public View getView(int position, View convertView, ViewGroup parent) {
+		LayoutInflater inflater = (LayoutInflater) context
+				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		TextView cellView = (TextView) convertView;
+
+		// For reuse
+		if (convertView == null) {
+			cellView = (TextView) inflater.inflate(R.layout.date_cell, null);
+		}
+
+		customizeTextView(position, cellView);
 
 		return cellView;
 	}

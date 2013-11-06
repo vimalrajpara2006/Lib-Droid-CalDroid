@@ -59,7 +59,8 @@ public final static String MIN_DATE = "minDate";
 public final static String MAX_DATE = "maxDate";
 public final static String ENABLE_SWIPE = "enableSwipe";
 public final static String START_DAY_OF_WEEK = "startDayOfWeek";
-public final static String FIT_ALL_MONTHS = "fitAllMonths";
+public final static String SIX_WEEKS_IN_CALENDAR = "sixWeeksInCalendar";
+public final static String ENABLE_CLICK_ON_DISABLED_DATES = "enableClickOnDisabledDates";
 ```
 
 To customize the startDayOfWeek, just use 
@@ -67,6 +68,14 @@ To customize the startDayOfWeek, just use
 ``` java
 Bundle args = new Bundle();
 args.putInt(CaldroidFragment.START_DAY_OF_WEEK, CaldroidFragment.TUESDAY); // Tuesday
+caldroidFragment.setArguments(args);
+```
+
+If you want to know when user clicks on disabled dates:
+
+```java
+Bundle args = new Bundle();
+args.putInt(CaldroidFragment.ENABLE_CLICK_ON_DISABLED_DATES, true);
 caldroidFragment.setArguments(args);
 ```
 
@@ -172,26 +181,78 @@ public void moveToDateTime(DateTime dateTime);
 Caldroid inform clients via CaldroidListener. 
 
 ``` java
-CaldroidListener listener = new CaldroidListener() {
+final CaldroidListener listener = new CaldroidListener() {
 
 	@Override
 	public void onSelectDate(Date date, View view) {
 		Toast.makeText(getApplicationContext(), formatter.format(date),
-				Toast.LENGTH_LONG).show();
+				Toast.LENGTH_SHORT).show();
 	}
 
 	@Override
 	public void onChangeMonth(int month, int year) {
 		String text = "month: " + month + " year: " + year;
-		Toast.makeText(getApplicationContext(), text, Toast.LENGTH_LONG)
-				.show();
+		Toast.makeText(getApplicationContext(), text,
+				Toast.LENGTH_SHORT).show();
+	}
+
+	@Override
+	public void onLongClickDate(Date date, View view) {
+		Toast.makeText(getApplicationContext(),
+				"Long click " + formatter.format(date),
+				Toast.LENGTH_SHORT).show();
+	}
+
+	@Override
+	public void onCaldroidViewCreated() {
+		Toast.makeText(getApplicationContext(),
+				"Caldroid view is created",
+				Toast.LENGTH_SHORT).show();
 	}
 
 };
-    
+
 caldroidFragment.setCaldroidListener(listener);
 
 ```
+
+
+## Client can customize look and feel of almost all views
+
+Client can set color of the weekday symbols (SUN, MON, ...) by:
+
+``` java
+WeekdayArrayAdapter.textColor = Color.BLUE;
+```
+
+User can also customize the navigation arrows and month title textView: font, size, onClickListener, onLongClickListener, etc. Client can supply different adapter to the weekdayGridView. Make sure you only access these methods after Caldroid has been successfully attached to view, otherwise you will see NullPointerException.
+
+``` java
+final CaldroidListener listener = new CaldroidListener() {
+
+	@Override
+	public void onSelectDate(Date date, View view) {
+		// Do something
+	}
+
+	@Override
+	public void onCaldroidViewCreated() {
+		// Supply your own adapter to weekdayGridView (SUN, MON, etc)
+		caldroidFragment.getWeekdayGridView().setAdapter(YOUR_ADAPTER);
+
+		Button leftButton = caldroidFragment.getLeftArrowButton;
+		Button rightButton = caldroidFragment.getLeftArrowButton();
+		TextView textView = caldroidFragment.getMonthTitleTextView();
+
+		// Do customization here
+	}
+
+};
+
+caldroidFragment.setCaldroidListener(listener);
+
+```
+
 
 ##Handle screen rotation
 
@@ -241,8 +302,8 @@ else {
   args.putInt(CaldroidFragment.MONTH, cal.get(Calendar.MONTH) + 1);
   args.putInt(CaldroidFragment.YEAR, cal.get(Calendar.YEAR));
   args.putBoolean(CaldroidFragment.ENABLE_SWIPE, true);
-  args.putBoolean(CaldroidFragment.FIT_ALL_MONTHS, false);
-	caldroidFragment.setArguments(args);
+  args.putBoolean(CaldroidFragment.SIX_WEEKS_IN_CALENDAR, false);
+  caldroidFragment.setArguments(args);
 }
 
 ```
@@ -329,27 +390,6 @@ public View getView(int position, View convertView, ViewGroup parent) {
 }
 ```
 
-## Client can customize look and feel of almost all views
-
-Client can set color of the weekday symbols (SUN, MON, ...) by:
-
-``` java
-WeekdayArrayAdapter.textColor = Color.BLUE;
-```
-
-For more customization, client can supply adapter to the weekdayGridView
-
-``` java
-caldroidFragment.getWeekdayGridView().setAdapter(YOUR_ADAPTER);
-```
-
-User can also customize the navigation arrows and month title textView. Make sure you only access these methods after Caldroid has been successfully attached to view, otherwise it is null.
-
-``` java
-public Button getLeftArrowButton();
-public Button getRightArrowButton();
-public TextView getMonthTitleTextView();
-```
 
 Basic Structure
 ===============
@@ -384,6 +424,7 @@ As most of Caldroid public API use Date instead of internal DateTime, you might 
 
 3) The package is renamed from ```com.caldroid``` to ```com.roomorama.caldroid```.
 
+4) The ```FIT_ALL_MONTH``` key has been renamed to ```SIX_WEEKS_IN_CALENDAR```. The display of calendar also depends on this parameter: if it is true, calendar always display 6 weeks in a calendar. Else, calendar will resize dynamically to the dates gridview.
 
 License
 =======

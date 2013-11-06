@@ -4,7 +4,6 @@ import hirondelle.date4j.DateTime;
 
 import java.util.ArrayList;
 
-
 import android.content.Context;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -23,9 +22,9 @@ public class InfiniteViewPager extends ViewPager {
 	public static final int OFFSET = 1000;
 
 	/**
-	 * dateInMonthsList is required to calculate the height correctly
+	 * datesInMonth is required to calculate the height correctly
 	 */
-	private ArrayList<DateTime> dateInMonthsList;
+	private ArrayList<DateTime> datesInMonth;
 
 	/**
 	 * Enable swipe
@@ -36,7 +35,7 @@ public class InfiniteViewPager extends ViewPager {
 	 * A calendar height is not fixed, it may have 4, 5 or 6 rows. Set
 	 * fitAllMonths to true so that the calendar will always have 6 rows
 	 */
-	private boolean fitAllMonths = true;
+	private boolean sixWeeksInCalendar = false;
 
 	/**
 	 * Use internally to decide height of the calendar
@@ -52,21 +51,21 @@ public class InfiniteViewPager extends ViewPager {
 		this.enabled = enabled;
 	}
 
-	public boolean isFitAllMonths() {
-		return fitAllMonths;
+	public boolean isSixWeeksInCalendar() {
+		return sixWeeksInCalendar;
 	}
 
-	public void setFitAllMonths(boolean fitAllMonths) {
-		this.fitAllMonths = fitAllMonths;
+	public ArrayList<DateTime> getDatesInMonth() {
+		return datesInMonth;
+	}
+
+	public void setDatesInMonth(ArrayList<DateTime> datesInMonth) {
+		this.datesInMonth = datesInMonth;
+	}
+
+	public void setSixWeeksInCalendar(boolean sixWeeksInCalendar) {
+		this.sixWeeksInCalendar = sixWeeksInCalendar;
 		rowHeight = 0;
-	}
-
-	public ArrayList<DateTime> getDateInMonthsList() {
-		return dateInMonthsList;
-	}
-
-	public void setDateInMonthsList(ArrayList<DateTime> dateInMonthsList) {
-		this.dateInMonthsList = dateInMonthsList;
 	}
 
 	// ************** Constructors ********************
@@ -116,7 +115,7 @@ public class InfiniteViewPager extends ViewPager {
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
 		// Calculate row height
-		int rows = dateInMonthsList.size() / 7;
+		int rows = datesInMonth.size() / 7;
 
 		boolean wrapHeight = MeasureSpec.getMode(heightMeasureSpec) == MeasureSpec.AT_MOST;
 
@@ -156,18 +155,16 @@ public class InfiniteViewPager extends ViewPager {
 
 		// Calculate height of the calendar
 		int calHeight = 0;
-		// If fitAllMonths, we need 6 rows
-		if (fitAllMonths) {
+
+		// If fit 6 weeks, we need 6 rows
+		if (sixWeeksInCalendar) {
 			calHeight = rowHeight * 6;
 		} else { // Otherwise we return correct number of rows
 			calHeight = rowHeight * rows;
 		}
 
-		// If the calculated height is bigger than the parent height, set it to
-		// parent height so the gridview can be scrolled
-		if (calHeight > height) {
-			calHeight = height;
-		}
+		// Prevent small vertical scroll
+		calHeight += 3;
 
 		heightMeasureSpec = MeasureSpec.makeMeasureSpec(calHeight,
 				MeasureSpec.EXACTLY);
